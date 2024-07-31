@@ -55,15 +55,6 @@ const addMessage = (threadId, content) => {
     )
 }
 
-function rollDice(dice) {
-    let [num, sides] = dice.split('d').map(Number);
-    let results = [];
-    for (let i = 0; i < num; i++) {
-        results.push(Math.floor(Math.random() * sides) + 1);
-    }
-    return results.join(', ');
-}
-
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
@@ -74,16 +65,6 @@ client.on('messageCreate', async message => {
     // Ignore bot messages.
     if (message.author.bot || !message.content || message.content === '') {
       return;
-    }
-
-    if (message.content.startsWith('!roll')) {
-      const input = message.content.replace('!roll', '').trim();
-      if (input.length === 0) {
-        message.reply('Please specify the type of dice to roll in the format XdY (e.g. 3d10)');
-        return;
-      }
-      const roll = rollDice(input);
-      message.reply(roll)
     }
 
     // Return if message doesn't start with !binks.
@@ -143,7 +124,7 @@ client.on('messageCreate', async message => {
       const messages = await openai.beta.threads.messages.list(openAiThreadId);
       let response = messages.data[0].content[0].text.value;
 
-      // Discord msg length limit when I was testing.
+      // Discord message length?
       response = response.substring(0, 1999)
 
       console.log(response);
