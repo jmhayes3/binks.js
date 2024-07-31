@@ -8,7 +8,7 @@ The bot operates within Discord channels, listening to messages and using OpenAI
 - **Discord Integration**: The bot listens to messages in Discord channels.
 - **OpenAI Response Generation**: Leverages the new OpenAI Assistants API to create responses to messages.
 - **Message Thread Tracking**: Maintains message threads for continuity in conversations.
-- **NEW Assistants Capabilities**: Since the bot uses Assistants, you no longer have to worry about context management and you can also benefit from assistant capabilities such as `code interpreter` and knowledge `retrieval`
+- **Assistants Capabilities**: Since the bot uses Assistants, you no longer have to worry about context management and you can also benefit from assistant capabilities such as `code interpreter` and knowledge `file search`
 
 ## Prerequisites
 
