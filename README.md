@@ -45,12 +45,12 @@ The bot operates within Discord channels, listening to messages and using OpenAI
 
 1. **Start the Bot**:
    ```
-   node bot.js
+   node main.js
    ```
 
 ## Usage
 
-- **Interaction**: Simply type and send messages in your Discord server where the bot is added. The bot will automatically generate and send replies based on the OpenAI model's output.
+- **Interaction**: Simply type `!binks` and then your message to send messages in your Discord server where the bot is added. The bot will automatically generate and send replies based on the OpenAI assistant's output.
 - **Discord Channels**: Works in any text channel or thread where the bot has permissions to read and send messages.
 
 ## Contributing
