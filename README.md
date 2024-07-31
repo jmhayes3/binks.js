@@ -50,7 +50,7 @@ The bot operates within Discord channels, listening to messages and using OpenAI
 
 ## Usage
 
-- **Interaction**: Simply type `!binks` and then your message to send messages in your Discord server where the bot is added. The bot will automatically generate and send replies based on the OpenAI assistant's output.
+- **Interaction**: Simply type `!binks` and then your message to interact with the bot. The bot will automatically generate and send replies based on the OpenAI assistant's output.
 - **Discord Channels**: Works in any text channel or thread where the bot has permissions to read and send messages.
 
 ## Contributing
