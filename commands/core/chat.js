@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { GuildTextThreadManager, SlashCommandBuilder } = require('discord.js');
+const { ThreadAutoArchiveDuration, SlashCommandBuilder } = require('discord.js');
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
@@ -18,7 +18,7 @@ const loadThread = (threadId) => {
   return threadCache[threadId];
 }
 
-const addThreadToCache = (threadId, openaiThreadId) => {
+const storeThread = (threadId, openaiThreadId) => {
   threadCache[threadId] = openaiThreadId;
 }
 
@@ -52,19 +52,15 @@ const addMessage = (threadId, content) => {
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('chat')
-    .setDescription('Start a new chat.')
+    .setDescription('Chat with an AI assistant.')
     .addStringOption((option) => option.setName('message').setDescription('Input text.').setRequired(true))
     .addStringOption((option) => option.setName('thread').setDescription('Thread ID.').setRequired(false))
-    .addStringOption((option) => option.setName('assistant').setDescription('OpenAI Assistant ID.').setRequired(false)),
+    .addStringOption((option) => option.setName('assistant').setDescription('Assistant ID.').setRequired(false)),
   async execute(interaction) {
     const sent = await interaction.reply({ content: 'Thinking...', fetchReply: true });
 
-    // TODO: Create proper discord thread from thread command option if
-    // it doesn't already exist.
-    // Check threadCache first.
-
     channel = await interaction.client.channels.fetch(process.env.CHANNEL_ID);
-    console.log("Channels: ", channel);
+    console.log("Channel: ", channel);
 
     const interactionId = interaction.id;
     console.log("Interaction ID: ", interactionId);
@@ -78,18 +74,22 @@ module.exports = {
     const threadId = interaction.options.getString('thread');
     console.log("Thread ID: ", threadId);
 
-    if (threadId) {
-      console.log(threadId);
-    }
-
-    let openaiThreadId = loadThread(interactionId);
-    console.log("OpenAI Thread ID: ", openaiThreadId);
+    let openaiThreadId = loadThread(threadId);
 
     if (!openaiThreadId) {
       const thread = await openai.beta.threads.create();
       openaiThreadId = thread.id;
-      addThreadToCache(interactionId, openaiThreadId);
     }
+    console.log("OpenAI Thread ID: ", openaiThreadId);
+
+    const new_thread = await channel.threads.create({
+      name: openaiThreadId,
+      autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
+      reason: "OpenAI thread.",
+    });
+    console.log("New thread: ", new_thread);
+
+    storeThread(new_thread.id, openaiThreadId);
 
     await addMessage(openaiThreadId, message);
 
