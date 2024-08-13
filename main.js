@@ -3,15 +3,15 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { OpenAI } = require("openai");
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ]
 });
 
 const openai = new OpenAI({
-  apiKey: process.env['OPENAI_API_KEY'],
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 const sleep = (ms) => {
@@ -49,14 +49,15 @@ const addMessage = (threadId, content) => {
     console.log("ADDING CONTENT: ", content)
     return openai.beta.threads.messages.create(
         threadId,
-        { role: "user",
-          content: content,
+        {
+            role: "user",
+            content: content,
         }
     )
 }
 
 client.once('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Logged in as ${client.user.tag}!`);
 });
 
 // This event will run every time a message is received.
@@ -64,73 +65,73 @@ client.on('messageCreate', async message => {
     console.log(message)
     // Ignore bot messages.
     if (message.author.bot || !message.content || message.content === '') {
-      return;
+        return;
     }
 
     // Return if message doesn't start with !binks.
     if (message.content.startsWith('!binks')) {
-      const msg = message.content.replace('!binks', '').trim();
-      if (msg.length === 0) {
-        message.reply('Please provide a question or instruction.');
-        return;
-      }
+        const msg = message.content.replace('!binks', '').trim();
+        if (msg.length === 0) {
+            message.reply('Please provide a question or instruction.');
+            return;
+        }
 
-      const discordThreadId = message.channel.id;
-      let openAiThreadId = getOpenAiThreadId(discordThreadId);
-      let messagesLoaded = false;
+        const discordThreadId = message.channel.id;
+        let openAiThreadId = getOpenAiThreadId(discordThreadId);
+        let messagesLoaded = false;
 
-      if (!openAiThreadId) {
-          const thread = await openai.beta.threads.create();
-          openAiThreadId = thread.id;
-          addThreadToMap(discordThreadId, openAiThreadId);
-          if (message.channel.isThread()){
-              // Gather all thread messages to fill out the OpenAI thread since
-              // we haven't seen this one yet.
-              const starterMsg = await message.channel.fetchStarterMessage();
-              const otherMessagesRaw = await message.channel.messages.fetch();
+        if (!openAiThreadId) {
+            const thread = await openai.beta.threads.create();
+            openAiThreadId = thread.id;
+            addThreadToMap(discordThreadId, openAiThreadId);
+            if (message.channel.isThread()) {
+                // Gather all thread messages to fill out the OpenAI thread since
+                // we haven't seen this one yet.
+                const starterMsg = await message.channel.fetchStarterMessage();
+                const otherMessagesRaw = await message.channel.messages.fetch();
 
-              const otherMessages = Array.from(otherMessagesRaw.values())
-                  .map(msg => msg.content)
-                  .reverse(); // oldest first
+                const otherMessages = Array.from(otherMessagesRaw.values())
+                    .map(msg => msg.content)
+                    .reverse(); // oldest first
 
-              const messages = [starterMsg.content, ...otherMessages]
-                  .filter(msg => !!msg && msg !== '')
+                const messages = [starterMsg.content, ...otherMessages]
+                    .filter(msg => !!msg && msg !== '')
 
-              // console.log(messages);
-              await Promise.all(messages.map(msg => addMessage(openAiThreadId, msg)));
-              messagesLoaded = true;
-          }
-      }
+                // console.log(messages);
+                await Promise.all(messages.map(msg => addMessage(openAiThreadId, msg)));
+                messagesLoaded = true;
+            }
+        }
 
-      if (message.attachments.size > 0) {
-          message.attachments.forEach(async (attachment) => {
-              console.log(`Attachment URL: ${attachment.url}`);
-          });
-      } else {
-          console.log('No attachments found.');
-      }
+        if (message.attachments.size > 0) {
+            message.attachments.forEach(async (attachment) => {
+                console.log(`Attachment URL: ${attachment.url}`);
+            });
+        } else {
+            console.log('No attachments found.');
+        }
 
-      if (!messagesLoaded) {
-          // If this is for a thread, assume msg was loaded via .fetch() earlier.
-          await addMessage(openAiThreadId, message.content);
-      }
+        if (!messagesLoaded) {
+            // If this is for a thread, assume msg was loaded via .fetch() earlier.
+            await addMessage(openAiThreadId, message.content);
+        }
 
-      const run = await openai.beta.threads.runs.create(
-          openAiThreadId,
-          { assistant_id: process.env.ASSISTANT_ID }
-      )
-      const status = await statusCheckLoop(openAiThreadId, run.id);
+        const run = await openai.beta.threads.runs.create(
+            openAiThreadId,
+            { assistant_id: process.env.ASSISTANT_ID }
+        )
+        const status = await statusCheckLoop(openAiThreadId, run.id);
 
-      const messages = await openai.beta.threads.messages.list(openAiThreadId);
-      let response = messages.data[0].content[0].text.value;
+        const messages = await openai.beta.threads.messages.list(openAiThreadId);
+        let response = messages.data[0].content[0].text.value;
 
-      // Discord message length?
-      response = response.substring(0, 1999)
+        // Discord message length?
+        response = response.substring(0, 1999)
 
-      console.log(response);
-      message.reply(response);
+        console.log(response);
+        message.reply(response);
     } else {
-      return;
+        return;
     }
 });
 
