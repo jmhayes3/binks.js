@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { ThreadAutoArchiveDuration, SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
@@ -39,7 +39,7 @@ const statusCheckLoop = async (openaiThreadId, runId) => {
 }
 
 const addMessage = (threadId, content) => {
-  console.log("Adding message to OpenAI thread: ", content)
+  console.log("Adding message to OpenAI thread", threadId, ":", content);
   return openai.beta.threads.messages.create(
     threadId,
     {
@@ -49,18 +49,30 @@ const addMessage = (threadId, content) => {
   )
 }
 
+function splitString(str, length) {
+  if (length <= 0) {
+    throw new Error('Length must be greater than 0');
+  }
+
+  const segments = [];
+  for (let i = 0; i < str.length; i += length) {
+    segments.push(str.slice(i, i + length));
+  }
+
+  return segments;
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('chat')
     .setDescription('Chat with an AI assistant.')
     .addStringOption((option) => option.setName('message').setDescription('Input text.').setRequired(true))
-    .addStringOption((option) => option.setName('thread').setDescription('Thread ID.').setRequired(false))
     .addStringOption((option) => option.setName('assistant').setDescription('Assistant ID.').setRequired(false)),
   async execute(interaction) {
-    const sent = await interaction.reply({ content: 'Thinking...', fetchReply: true });
+    await interaction.deferReply();
 
-    channel = await interaction.client.channels.fetch(process.env.CHANNEL_ID);
-    console.log("Channel: ", channel);
+    channelId = await interaction.channelId;
+    console.log("Channel ID: ", channelId);
 
     const interactionId = interaction.id;
     console.log("Interaction ID: ", interactionId);
@@ -71,27 +83,17 @@ module.exports = {
     const assistantId = interaction.options.getString('assistant');
     console.log("Assistant ID: ", assistantId);
 
-    const threadId = interaction.options.getString('thread');
-    console.log("Thread ID: ", threadId);
-
-    let openaiThreadId = loadThread(threadId);
+    // let openaiThreadId = loadThread(threadId);
+    let openaiThreadId;
 
     if (!openaiThreadId) {
       const thread = await openai.beta.threads.create();
       openaiThreadId = thread.id;
     }
-    console.log("OpenAI Thread ID: ", openaiThreadId);
-
-    const new_thread = await channel.threads.create({
-      name: openaiThreadId,
-      autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
-      reason: "OpenAI thread.",
-    });
-    console.log("New thread: ", new_thread);
-
-    storeThread(new_thread.id, openaiThreadId);
 
     await addMessage(openaiThreadId, message);
+
+    storeThread(channelId, openaiThreadId);
 
     const run = await openai.beta.threads.runs.create(
       openaiThreadId,
@@ -103,10 +105,23 @@ module.exports = {
     const messages = await openai.beta.threads.messages.list(openaiThreadId);
     let response = messages.data[0].content[0].text.value;
 
-    // TODO: split up messages
-    response = response.substring(0, 1999)  // Discord message length?
-    console.log("Response: ", response);
+    const responses = splitString(response, 2000);
 
-    interaction.editReply(`${response} (Latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms)`);
+    console.log("Num Responses: ", responses.length);
+    console.log("Responses: ", responses);
+
+    await interaction.followUp(responses[0]);
+
+    if (responses.length > 1) {
+      for (let i = 1; i < responses.length; ++i) {
+        console.log(i, responses[i]);
+        // fetch channel and send message
+        // channel = await interaction.client.channels.fetch(channelId);
+        // replies.push(await channel.send(responses[i]));
+
+        // use followUp instead (15 minute window after deferReply is sent)
+        await interaction.followUp(responses[i]);
+      }
+    }
   },
 };
