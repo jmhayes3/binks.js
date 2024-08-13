@@ -11,17 +11,6 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const threadCache = {};
-
-const loadThread = (threadId) => {
-  // Replace this in-memory implementation with a database (e.g. DynamoDB, Firestore, Redis)
-  return threadCache[threadId];
-}
-
-const storeThread = (threadId, openaiThreadId) => {
-  threadCache[threadId] = openaiThreadId;
-}
-
 const terminalStates = ["cancelled", "failed", "completed", "expired"];
 const statusCheckLoop = async (openaiThreadId, runId) => {
   const run = await openai.beta.threads.runs.retrieve(
@@ -83,17 +72,10 @@ module.exports = {
     const assistantId = interaction.options.getString('assistant');
     console.log("Assistant ID: ", assistantId);
 
-    // let openaiThreadId = loadThread(threadId);
-    let openaiThreadId;
-
-    if (!openaiThreadId) {
-      const thread = await openai.beta.threads.create();
-      openaiThreadId = thread.id;
-    }
+    const thread = await openai.beta.threads.create();
+    const openaiThreadId = thread.id;
 
     await addMessage(openaiThreadId, message);
-
-    storeThread(channelId, openaiThreadId);
 
     const run = await openai.beta.threads.runs.create(
       openaiThreadId,
@@ -103,7 +85,7 @@ module.exports = {
     console.log("Status: ", status);
 
     const messages = await openai.beta.threads.messages.list(openaiThreadId);
-    let response = messages.data[0].content[0].text.value;
+    const response = messages.data[0].content[0].text.value;
 
     const responses = splitString(response, 2000);
 
@@ -112,14 +94,18 @@ module.exports = {
 
     await interaction.followUp(responses[0]);
 
+    if (interaction.channel.isThread()) {
+      console.log("is thread");
+      console.log(interaction.channel);
+    } else {
+      console.log("not thread");
+      console.log(interaction.channel);
+    }
+
     if (responses.length > 1) {
       for (let i = 1; i < responses.length; ++i) {
-        console.log(i, responses[i]);
-        // fetch channel and send message
-        // channel = await interaction.client.channels.fetch(channelId);
-        // replies.push(await channel.send(responses[i]));
+        console.log(responses[i]);
 
-        // use followUp instead (15 minute window after deferReply is sent)
         await interaction.followUp(responses[i]);
       }
     }

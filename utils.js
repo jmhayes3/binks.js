@@ -1,11 +1,12 @@
-const { ChannelType, ThreadAutoArchiveDuration } = require('discord.js');
+function splitString(str, length) {
+  if (length <= 0) {
+    throw new Error('Length must be greater than 0');
+  }
 
-const threadName = "new-thread";
+  const segments = [];
+  for (let i = 0; i < str.length; i += length) {
+    segments.push(str.slice(i, i + length));
+  }
 
-const new_thread = await channel.threads.create({
-  name: threadName,
-  autoArchiveDuration: ThreadAutoArchiveDuration.OneHour,
-  type: ChannelType.PrivateThread,
-  reason: "Private chat thread.",
-});
-console.log("Thread created: ", new_thread);
+  return segments;
+}
