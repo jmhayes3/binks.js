@@ -45,7 +45,7 @@ The bot operates within Discord channels, listening to messages and using the As
 
 1. **Start the Bot**:
    ```
-   node main.js
+   node index.js
    ```
 
 ## Usage
