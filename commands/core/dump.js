@@ -30,17 +30,29 @@ module.exports = {
 		console.log(openaiThreadId);
 
 		const messagesList = await openai.beta.threads.messages.list(openaiThreadId);
-		console.log("Messages List: ", messagesList);
+		console.log("Messages List:", messagesList);
 
 		const messages = Array.from(messagesList.data).map(msg => msg.content).reverse();
 		console.log(messages);
 
 		for await (const msg of messages) {
-			const content = msg[0].text.value;
-			const replies = splitString(content, 2000);
-			for (let i = 0; i < replies.length; i++) {
-				console.log(replies[i]);
-				await interaction.followUp({ content: replies[i] });
+			let content = null;
+			if (msg[0].text) {
+				content = msg[0].text.value;
+				console.log("Content:", content);
+				const replies = splitString(content, 2000);
+				for (let i = 0; i < replies.length; i++) {
+					console.log(replies[i]);
+					await interaction.followUp({ content: replies[i] });
+				}
+			} else if (msg[0].image_file) {
+				const image = msg[0].image_file;
+				console.log("Image file:", image);
+				await interaction.followUp({ content: image });
+			} else if (msg[0].image_url) {
+				const image = msg[0].image_url;
+				console.log("Image url:", image);
+				await interaction.followUp({ content: image });
 			}
 		}
 	}
