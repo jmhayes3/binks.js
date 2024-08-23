@@ -1,7 +1,7 @@
 {
   "name": "binksjs",
   "version": "0.1.0",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
     "test": "npm run lint",
     "lint": "npx eslint ."
