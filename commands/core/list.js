@@ -7,8 +7,6 @@ const openai = new OpenAI({
 
 const getAssistants = async () => {
 	const payload = await openai.beta.assistants.list();
-	// const assistants = Array.from(payload.data).map(msg => msg.name);
-	// return assistants;
 	return Array.from(payload.data).map(msg => msg.name);
 }
 
@@ -17,11 +15,9 @@ module.exports = {
 		.setName('list')
 		.setDescription('List all available OpenAI assistants.'),
 	async execute(interaction) {
-		await interaction.deferReply();
-
 		const assistants = await getAssistants();
 		const reply = assistants.join("\n");
 
-		await interaction.followUp({ content: reply, ephemeral: true });
+		await interaction.reply({ content: reply, ephemeral: true });
 	},
 };
