@@ -20,8 +20,8 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		await interaction.followUp("Available OpenAI assistants: ");
-
 		await listAssistants();
+
+		await interaction.followUp("Available OpenAI assistants: ");
 	},
 };
