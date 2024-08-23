@@ -19,10 +19,8 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const header = "**Available OpenAI assistants:**\n";
 		const assistants = await getAssistants();
-		const content = assistants.join("\n");
-		const reply = header + content;
+		const reply = assistants.join("\n");
 
 		await interaction.followUp({ content: reply });
 	},
