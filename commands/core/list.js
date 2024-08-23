@@ -22,6 +22,6 @@ module.exports = {
 		const assistants = await getAssistants();
 		const reply = assistants.join("\n");
 
-		await interaction.followUp({ content: reply });
+		await interaction.followUp({ content: reply, ephemeral: true });
 	},
 };
