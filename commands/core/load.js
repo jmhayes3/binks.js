@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { OpenAI } = require("openai");
+import 'dotenv/config';
+import { SlashCommandBuilder } from 'discord.js';
+import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
@@ -16,33 +17,30 @@ const addMessage = (threadId, content) => {
 	)
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('load')
-		.setDescription('Load messages into an OpenAI thread.'),
-	async execute(interaction) {
-		await interaction.deferReply();
+export const data = new SlashCommandBuilder().setName('load').setDescription('Load messages into an OpenAI thread.');
 
-		const thread = await openai.beta.threads.create();
-		const openaiThreadId = thread.id;
+export async function execute(interaction) {
+	await interaction.deferReply();
 
-		// load messages from thread
-		if (interaction.channel.isThread()) {
-			const messagesRaw = await interaction.channel.messages.fetch();
+	const thread = await openai.beta.threads.create();
+	const openaiThreadId = thread.id;
 
-			// load oldest messages first
-			const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
-			console.log(messages);
+	// load messages from thread
+	if (interaction.channel.isThread()) {
+		const messagesRaw = await interaction.channel.messages.fetch();
 
-			// remove empty messages
-			const filteredMessages = messages.filter(msg => !!msg && msg !== '')
-			console.log(filteredMessages);
+		// load oldest messages first
+		const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
+		console.log(messages);
 
-			await Promise.all(filteredMessages.map(msg => addMessage(openaiThreadId, msg)));
+		// remove empty messages
+		const filteredMessages = messages.filter(msg => !!msg && msg !== '')
+		console.log(filteredMessages);
 
-			await interaction.followUp("Messages loaded into OpenAI thread: " + openaiThreadId);
-		} else {
-			await interaction.followUp({ content: "Load failed. Not in a thread." });
-		}
-	},
+		await Promise.all(filteredMessages.map(msg => addMessage(openaiThreadId, msg)));
+
+		await interaction.followUp("Messages loaded into OpenAI thread: " + openaiThreadId);
+	} else {
+		await interaction.followUp({ content: "Load failed. Not in a thread." });
+	}
 };

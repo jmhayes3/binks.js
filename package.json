@@ -1,15 +1,18 @@
 {
   "name": "binksjs",
   "version": "0.1.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "npm run lint",
-    "lint": "npx eslint ."
-  },
+  "description": "",
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "npx eslint .",
+    "test": "npm run lint",
+    "start": "node index.js",
+    "register": "node deploy-commands.js"
+  },
   "dependencies": {
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",

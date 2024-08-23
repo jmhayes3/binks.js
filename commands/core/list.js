@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { OpenAI } = require("openai");
+import 'dotenv/config';
+import { SlashCommandBuilder } from 'discord.js';
+import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
@@ -7,19 +8,24 @@ const openai = new OpenAI({
 
 const getAssistants = async () => {
 	const payload = await openai.beta.assistants.list();
-	return Array.from(payload.data).map(msg => msg.name);
+	// console.log(payload);
+	const data = [];
+	for (let i = 0; i < payload.data.length; i++) {
+		console.log(payload.data[i]);
+		const text = payload.data[i].name + " " + "(" + payload.data[i].model + ")";
+		data.push(text);
+	}
+	return data;
 }
 
-module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('list')
-		.setDescription('List all available OpenAI assistants.'),
-	async execute(interaction) {
-		await interaction.deferReply();
+export const data = new SlashCommandBuilder().setName('list').setDescription('List all available OpenAI assistants.');
 
-		const assistants = await getAssistants();
-		const reply = assistants.join("\n");
+export async function execute(interaction) {
+	await interaction.deferReply();
 
-		await interaction.followUp({ content: reply, ephemeral: true });
-	},
-};
+	const assistants = await getAssistants();
+	console.log(assistants);
+	const reply = assistants.join("\n");
+
+	await interaction.followUp({ content: reply, ephemeral: true });
+}

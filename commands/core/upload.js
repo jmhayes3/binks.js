@@ -1,19 +1,18 @@
-const { readFile } = require('fs/promises');
-const { SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+import { readFile } from 'node:fs/promises';
+import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName('upload')
-    .setDescription('Upload a file.'),
-  async execute(interaction) {
-    await interaction.deferReply();
+export const data = new SlashCommandBuilder().setName('upload').setDescription('Upload a file.');
 
-    const image_file = await readFile('./data/image.jpg');
-    const image_name = "data/image.jpg";
-    const attachment = new AttachmentBuilder(image_file, { name: image_name });
-    console.log("Attachment:", attachment);
+export async function execute(interaction) {
+  await interaction.deferReply();
 
-    const response = "File uploaded.";
-    await interaction.followUp({ content: response });
-  },
+  const image_file = await readFile('./data/image.jpg');
+  const image_name = "data/image.jpg";
+  const image_description = "Image file."
+
+  const attachment = new AttachmentBuilder(image_file, { name: image_name, description: image_description });
+  console.log("Attachment:", attachment);
+
+  const response = "File uploaded.";
+  await interaction.followUp({ content: response });
 };
