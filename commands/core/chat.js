@@ -60,7 +60,7 @@ module.exports = {
   async execute(interaction) {
     await interaction.deferReply();
 
-    channelId = await interaction.channelId;
+    const channelId = await interaction.channelId;
     console.log("Channel ID: ", channelId);
 
     const interactionId = interaction.id;
