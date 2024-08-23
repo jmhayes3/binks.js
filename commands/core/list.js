@@ -15,9 +15,11 @@ module.exports = {
 		.setName('list')
 		.setDescription('List all available OpenAI assistants.'),
 	async execute(interaction) {
+		await interaction.deferReply();
+
 		const assistants = await getAssistants();
 		const reply = assistants.join("\n");
 
-		await interaction.reply({ content: reply, ephemeral: true });
+		await interaction.followUp({ content: reply, ephemeral: true });
 	},
 };
