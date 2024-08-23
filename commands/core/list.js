@@ -8,8 +8,10 @@ const openai = new OpenAI({
 const listAssistants = async () => {
 	console.log("Listing assistants...");
 
-	const assistants = await openai.beta.assistants.list();
+	const payload = await openai.beta.assistants.list();
+	console.log("Payload:", payload);
 
+	const assistants = Array.from(payload.values()).map(msg => msg.body);
 	console.log("Assistants:", assistants);
 }
 
