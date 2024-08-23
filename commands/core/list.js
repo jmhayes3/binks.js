@@ -5,12 +5,11 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
-const listAssistants = async () => {
-	console.log("Listing assistants...");
-
-	const assistants = await openai.beta.assistants.list();
-
-	console.log("Assistants:", assistants);
+const getAssistants = async () => {
+	const payload = await openai.beta.assistants.list();
+	// const assistants = Array.from(payload.data).map(msg => msg.name);
+	// return assistants;
+	return Array.from(payload.data).map(msg => msg.name);
 }
 
 module.exports = {
@@ -20,8 +19,9 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		await interaction.followUp("Available OpenAI assistants: ");
+		const assistants = await getAssistants();
+		const reply = assistants.join("\n");
 
-		await listAssistants();
+		await interaction.followUp({ content: reply });
 	},
 };
