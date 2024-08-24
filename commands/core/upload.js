@@ -1,10 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
-export const data = new SlashCommandBuilder().setName('upload').setDescription('Upload a file.');
+export const data = new SlashCommandBuilder().setName('upload').setDescription('Upload a file');
 
 export async function execute(interaction) {
-  await interaction.deferReply();
+  await interaction.deferReply({ ephemeral: true });
 
   const image_file = await readFile('./data/image.jpg');
   const image_name = "data/image.jpg";
@@ -14,5 +14,5 @@ export async function execute(interaction) {
   console.log("Attachment:", attachment);
 
   const response = "File uploaded.";
-  await interaction.followUp({ content: response });
+  await interaction.followUp({ content: response, ephemeral: true });
 };

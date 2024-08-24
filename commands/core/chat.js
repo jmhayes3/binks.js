@@ -1,15 +1,15 @@
 import 'dotenv/config';
 import { SlashCommandBuilder } from 'discord.js';
 import { OpenAI } from 'openai';
-import { splitString } from '../../utils.js';
+import { sleep, splitString } from '../../utils.js';
 
 const openai = new OpenAI({
   apiKey: process.env['OPENAI_API_KEY'],
 });
 
-const sleep = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// const sleep = (ms) => {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
 
 const terminalStates = ["cancelled", "failed", "completed", "expired"];
 const statusCheckLoop = async (openaiThreadId, runId) => {

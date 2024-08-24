@@ -10,3 +10,8 @@ export function splitString(str, length) {
   }
   return segments;
 }
+
+export const sleep = (ms) => {
+  console.log("Sleeping " + ms + "ms");
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
