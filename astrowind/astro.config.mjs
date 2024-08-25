@@ -77,10 +77,10 @@ export default defineConfig({
     }),
   ],
 
-  // image: {
-  //   service: squooshImageService(),
-  //   domains: ['cdn.pixabay.com'],
-  // },
+  image: {
+    service: squooshImageService(),
+    domains: ['cdn.pixabay.com'],
+  },
 
   markdown: {
     remarkPlugins: [readingTimeRemarkPlugin],
