@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": "^18.17.1 || ^20.3.0 || >= 21.0.0"
+    "node": "^18 || ^20 || >= 21"
   },
   "scripts": {
     "dev": "astro dev",
