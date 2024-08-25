@@ -1,17 +1,17 @@
 site:
   name: binksjs
   site: 'https://jmhayes3.github.io/binksjs'
-  base: '/'
+  base: '/binksjs'
   trailingSlash: false
 
-  # googleSiteVerificationId: orcPxI47GSa-cRvY11tUe6iGg2IO_RPvnA1q95iEM3M
+  googleSiteVerificationId: false
 
 # Default SEO metadata
 metadata:
   title:
     default: Binks
     template: '%s — Binks'
-  description: "\U0001F680 Binks documentation."
+  description: 'Project page for Binks.'
   robots:
     index: true
     follow: true
@@ -22,6 +22,10 @@ metadata:
         width: 1200
         height: 628
     type: website
+  twitter:
+    handle: '@twitter_user'
+    site: '@twitter_user'
+    cardType: summary_large_image
 
 i18n:
   language: en
