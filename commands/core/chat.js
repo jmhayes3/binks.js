@@ -7,10 +7,6 @@ const openai = new OpenAI({
   apiKey: process.env['OPENAI_API_KEY'],
 });
 
-// const sleep = (ms) => {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// }
-
 const terminalStates = ["cancelled", "failed", "completed", "expired"];
 const statusCheckLoop = async (openaiThreadId, runId) => {
   const run = await openai.beta.threads.runs.retrieve(
@@ -38,7 +34,7 @@ const addMessage = (threadId, content) => {
   )
 }
 
-export const data = new SlashCommandBuilder().setName('chat').setDescription('Chat with an AI assistant').addStringOption((option) => option.setName('message').setDescription('Input text.').setRequired(true)).addStringOption((option) => option.setName('assistant').setDescription('Assistant ID.').setRequired(false));
+export const data = new SlashCommandBuilder().setName('chat').setDescription('Start a chat with an AI assistant.').addStringOption((option) => option.setName('prompt').setDescription('Prompt.').setRequired(true)).addStringOption((option) => option.setName('assistant').setDescription('Assistant ID.').setRequired(false));
 
 export async function execute(interaction) {
   await interaction.deferReply();
@@ -49,7 +45,7 @@ export async function execute(interaction) {
   const interactionId = interaction.id;
   console.log("Interaction ID: ", interactionId);
 
-  const message = interaction.options.getString('message');
+  const message = interaction.options.getString('prompt');
   console.log("Message: ", message);
 
   const assistantId = interaction.options.getString('assistant');

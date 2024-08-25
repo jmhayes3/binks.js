@@ -13,7 +13,7 @@ export async function execute(interaction) {
   const user = interaction.user.username;
 
   if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-    return interaction.reply({ content: 'No perms', ephemeral: true });
+    return interaction.reply({ content: 'Needs ManageMessages permission', ephemeral: true });
   }
 
   if (isNaN(amount) || parseInt(amount) < 1 || parseInt(amount) > 99) {
@@ -25,10 +25,8 @@ export async function execute(interaction) {
   const deletedSize = await deleteMessages(interaction.channel, parseInt(amount), user);
 
   const clearEmbed = new EmbedBuilder()
-    .setAuthor({ name: 'Clear' })
     .setColor('#333333')
     .setTitle(`Clear used in ${interaction.channel}`)
-    .setThumbnail(interaction.client.user.avatarURL())
     .setFooter({ text: `Clear` })
     .setTimestamp()
 
