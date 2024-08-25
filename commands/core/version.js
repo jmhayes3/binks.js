@@ -1,19 +1,13 @@
-export async function getLatestVersion() {
-  try {
-    const latestVersion = "0.1.0";
-    console.log(latestVersion);
-    return latestVersion;
-  } catch (error) {
-    console.error(`Error while retrieving the latest version. No release found.\n ${error}`);
-  }
-}
+import { SlashCommandBuilder } from 'discord.js';
+import { checkVersion } from '../../utils.js';
 
-export function checkVersion(currentVersion) {
-  getLatestVersion().then((latestVersion) => {
-    if (currentVersion < latestVersion) {
-      console.log(`A new update is available: ${latestVersion}`);
-    } else {
-      console.log(`You have the latest version of the code.`);
-    }
-  });
+export const data = new SlashCommandBuilder().setName('version').setDescription('Display version info');
+
+export async function execute(interaction) {
+  await interaction.deferReply({ ephemeral: true });
+
+  const currentVersion = '0.1.0';
+  const version = await checkVersion(currentVersion);
+
+  await interaction.followUp({ content: version, ephemeral: true });
 }
