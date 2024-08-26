@@ -18,7 +18,7 @@ export const sleep = (ms) => {
 
 export async function getLatestVersion() {
   try {
-    const response = await fetch('https://github.com/jmhayes3/binksjs/releases/latest');
+    const response = await fetch('https://github.com/jmhayes3/binks.js/releases/latest');
     console.log(response);
 
     const url = response.url;
