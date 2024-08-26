@@ -1,6 +1,6 @@
-# binksjs
+# binks.js
 
-binksjs is a chatbot that integrates Discord.js with the new OpenAI Assistants API.
+binks.js is a chatbot that integrates Discord.js with the new OpenAI Assistants API.
 The bot operates within Discord channels, listening to messages and using the Assistants API to generate responses.
 
 ## Features
@@ -20,11 +20,11 @@ The bot operates within Discord channels, listening to messages and using the As
 
 1. **Clone the Repository**:
    ```
-   git clone https://github.com/jmhayes3/binksjs.git
+   git clone https://github.com/jmhayes3/binks.js.git
    ```
 2. **Navigate to the Repository Folder**:
    ```
-   cd binksjs
+   cd binks.js
    ```
 3. **Install Dependencies**:
    ```
