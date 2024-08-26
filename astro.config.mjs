@@ -29,8 +29,8 @@ const whenExternalScripts = (items = []) =>
     : [];
 
 export default defineConfig({
-  site: "https://github.com/jmhayes3/binksjs",
-  base: "binksjs",
+  site: "https://github.com/jmhayes3/binks.js",
+  base: "binks.js",
 
   output: "static",
 
