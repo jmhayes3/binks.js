@@ -7,38 +7,47 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
-export const data = new SlashCommandBuilder().setName('dump').setDescription('Dump messages from an OpenAI thread into a Discord thread.').addStringOption((option) => option.setName('thread').setDescription('OpenAI thread ID.').setRequired(true));
+export const data = new SlashCommandBuilder()
+	.setName('dump')
+	.setDescription('Dump messages from an OpenAI thread into the channel/thread')
+	.addStringOption((option) => option.setName('thread')
+		.setDescription('OpenAI thread')
+		.setRequired(true)
+	);
 
 export async function execute(interaction) {
 	await interaction.deferReply();
 
+	// TODO: check cache first
 	const openaiThreadId = interaction.options.getString('thread');
-	console.log(openaiThreadId);
 
 	const messagesList = await openai.beta.threads.messages.list(openaiThreadId);
-	console.log("Messages List:", messagesList);
-
 	const messages = Array.from(messagesList.data).map(msg => msg.content).reverse();
-	console.log(messages);
 
+	let replyCount = 0;
 	for await (const msg of messages) {
-		let content = null;
 		if (msg[0].text) {
-			content = msg[0].text.value;
-			console.log("Content:", content);
-			const replies = splitString(content, 2000);
+			const text = msg[0].text.value;
+			const replies = splitString(text, 2000);
 			for (let i = 0; i < replies.length; i++) {
-				console.log(replies[i]);
+				console.log(`Sending reply ${i} of ${replies.length}`);
 				await interaction.followUp({ content: replies[i] });
+				replyCount++;
 			}
 		} else if (msg[0].image_file) {
-			const image = msg[0].image_file;
-			console.log("Image file:", image);
-			await interaction.followUp({ content: image });
+			const reply = "image file type";
+			console.log(`Reply: ${reply}`);
+			await interaction.followUp({ content: reply });
+			replyCount++;
 		} else if (msg[0].image_url) {
-			const image = msg[0].image_url;
-			console.log("Image url:", image);
-			await interaction.followUp({ content: image });
+			const reply = "image uri type";
+			console.log(`Reply: ${reply}`);
+			await interaction.followUp({ content: reply });
+			replyCount++;
 		}
 	}
+
+	const reply = `Added ${replyCount} messages to this thread.`;
+	console.log(reply);
+	await interaction.followUp({ content: reply, ephemeral: false });
 };

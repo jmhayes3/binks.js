@@ -6,41 +6,50 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
-const addMessage = (threadId, content) => {
-	console.log("Adding message to OpenAI thread", threadId, ":", content);
-	return openai.beta.threads.messages.create(
-		threadId,
-		{
-			role: "user",
-			content: content,
-		}
-	)
-}
-
-export const data = new SlashCommandBuilder().setName('load').setDescription('Load messages into an OpenAI thread.');
+// export const data = new SlashCommandBuilder().setName('load').setDescription('Load messages into an OpenAI thread.');
+export const data = new SlashCommandBuilder()
+	.setName('load')
+	.setDescription('Add messages to an OpenAI thread.')
+	.addStringOption((option) => option.setName('thread')
+		.setDescription('OpenAI thread ID.')
+		.setRequired(false)
+	);
 
 export async function execute(interaction) {
-	await interaction.deferReply();
+	await interaction.deferReply({ ephemeral: false });
 
-	const thread = await openai.beta.threads.create();
-	const openaiThreadId = thread.id;
-
-	// load messages from thread
+	let reply = null;
 	if (interaction.channel.isThread()) {
 		const messagesRaw = await interaction.channel.messages.fetch();
 
 		// load oldest messages first
 		const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
-		console.log(messages);
 
 		// remove empty messages
 		const filteredMessages = messages.filter(msg => !!msg && msg !== '')
-		console.log(filteredMessages);
 
-		await Promise.all(filteredMessages.map(msg => addMessage(openaiThreadId, msg)));
+		// TODO: Check cache first. If cached, only upload messages newer than the
+		// timestamp of the last cached message.
+		const thread = await openai.beta.threads.create();
 
-		await interaction.followUp("Messages loaded into OpenAI thread: " + openaiThreadId);
+		let messageCount = 0;
+		for await (const message of filteredMessages) {
+			await openai.beta.threads.messages.create(
+				thread.id,
+				{
+					role: "user",
+					content: message,
+				}
+			)
+			messageCount++;
+		}
+		reply = `Successfully added ${messageCount} messages to ${thread.id}`;
 	} else {
-		await interaction.followUp({ content: "Load failed. Not in a thread." });
+		reply = "Failed: Not in a thread.";
+	}
+
+	if (reply) {
+		console.log("Reply:", reply);
+		await interaction.followUp({ content: reply, ephemeral: false });
 	}
 };
