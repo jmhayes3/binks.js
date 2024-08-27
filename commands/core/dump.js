@@ -20,35 +20,31 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
 	await interaction.deferReply({ ephemeral: false });
 
-	let reply = null;
-	if (interaction.channel.isThread()) {
-		const messagesRaw = await interaction.channel.messages.fetch();
+	const messagesRaw = await interaction.channel.messages.fetch();
 
-		// load oldest messages first
-		const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
+	// load oldest messages first
+	const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
 
-		// remove empty messages
-		const filteredMessages = messages.filter(msg => !!msg && msg !== '')
+	// remove empty messages
+	const filteredMessages = messages.filter(msg => !!msg && msg !== '')
 
-		// TODO: Check cache first. If cached, only upload messages newer than the
-		// timestamp of the last cached message.
-		const thread = await openai.beta.threads.create();
+	// TODO: Check cache first. If cached, only upload messages newer than the
+	// timestamp of the last cached message.
+	const thread = await openai.beta.threads.create();
 
-		let messageCount = 0;
-		for await (const message of filteredMessages) {
-			await openai.beta.threads.messages.create(
-				thread.id,
-				{
-					role: "user",
-					content: message,
-				}
-			)
-			messageCount++;
-		}
-		reply = `Successfully added ${messageCount} messages to ${thread.id}`;
-	} else {
-		reply = "Error: Not in a thread."
+	let messageCount = 0;
+	for await (const message of filteredMessages) {
+		await openai.beta.threads.messages.create(
+			thread.id,
+			{
+				role: "user",
+				content: message,
+			}
+		)
+		messageCount++;
 	}
+
+	const reply = `Successfully added ${messageCount} messages to ${thread.id}`;
 	console.log("Reply:", reply);
 
 	await interaction.followUp({ content: reply, ephemeral: false });

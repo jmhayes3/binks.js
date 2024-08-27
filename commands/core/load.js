@@ -30,13 +30,9 @@ export async function execute(interaction) {
 		if (msg[0].text) {
 			const text = msg[0].text.value;
 			const replies = splitString(text, 2000);
-
-			let i = 0;
-			for (; i < replies.length; i++) {
-				console.log(`Sending reply ${i + 1} of ${replies.length}`);
-
+			for (let i = 0; i < replies.length; i++) {
+				console.log(`Sending reply ${i} of ${replies.length} for message ${messageCount}`);
 				await interaction.followUp({ content: replies[i] });
-
 				repliesSent++;
 			}
 		}
@@ -54,9 +50,11 @@ export async function execute(interaction) {
 		}
 		messageCount++;
 	}
-	console.log(`Messages: ${messageCount}, Replies: ${repliesSent}`);
+	console.log(`Messages: ${messageCount}\nReplies: ${repliesSent}`);
 
 	const reply = `Loaded ${repliesSent} messages into this channel/thread.`;
+
 	console.log(`Reply: ${reply}`);
+
 	await interaction.followUp({ content: reply, ephemeral: false });
 };
