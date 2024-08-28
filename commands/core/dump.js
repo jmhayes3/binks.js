@@ -2,40 +2,58 @@ import 'dotenv/config';
 import { SlashCommandBuilder } from 'discord.js';
 import { OpenAI } from 'openai';
 
+// TODO: Scrap this command, it's not exactly useful.
+
 const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
 export const data = new SlashCommandBuilder()
 	.setName('dump')
-	.setDescription('Add messages from current channel/thread to an OpenAI thread')
-	.addNumberOption((option) => option.setName('amount')
-		.setDescription('Number of messages')
+	.setDescription('Dump messages from current channel/thread into an OpenAI thread')
+	.addStringOption((option) => option.setName('thread')
+		.setDescription('OpenAI Thread ID')
 		.setRequired(true)
-	).addStringOption((option) => option.setName('thread')
-		.setDescription('OpenAI thread ID')
+	).addNumberOption((option) => option.setName('amount')
+		.setDescription('Amount.')
 		.setRequired(false)
 	);
 
 export async function execute(interaction) {
-	await interaction.deferReply({ ephemeral: false });
+	await interaction.deferReply({ ephemeral: true });
 
-	const messagesRaw = await interaction.channel.messages.fetch();
+	const threadId = interaction.options.getString('thread');
+	const amount = interaction.options.getNumber('amount');
+	console.log("ThreadId:", threadId);
+	console.log("Amount:", amount);
 
-	// load oldest messages first
-	const messages = Array.from(messagesRaw.values()).map(msg => msg.content).reverse();
-
+	const channelMessages = await interaction.channel.messages.fetch();
+	// load oldest messages first. could change sort value in request?
+	const messages = Array.from(channelMessages.values()).map(msg => msg.content).reverse();
 	// remove empty messages
-	const filteredMessages = messages.filter(msg => !!msg && msg !== '')
+	const filteredMessages = messages.filter(msg => !!msg && msg !== '');
 
-	// TODO: Check cache first. If cached, only upload messages newer than the
-	// timestamp of the last cached message.
-	const thread = await openai.beta.threads.create();
+	let activeThread = null;
+	try {
+		console.log(`Fetching thread ${threadId}...`);
+		const thread = await openai.beta.threads.retrieve(threadId);
+		console.log(`Thread retrieved: ${thread.id}`);
+		activeThread = thread;
+	} catch (error) {
+		if (error instanceof OpenAI.NotFoundError) {
+			console.error("NotFoundError!", error.message);
+			const thread = await openai.beta.threads.create();
+			console.log(`New thread created: ${thread.id}`);
+			activeThread = thread;
+		} else if (error instanceof OpenAI.APIError) {
+			console.error("APIError!", error.message);
+		}
+	}
 
 	let messageCount = 0;
 	for await (const message of filteredMessages) {
 		await openai.beta.threads.messages.create(
-			thread.id,
+			activeThread.id,
 			{
 				role: "user",
 				content: message,
@@ -44,8 +62,8 @@ export async function execute(interaction) {
 		messageCount++;
 	}
 
-	const reply = `Successfully added ${messageCount} messages to ${thread.id}`;
-	console.log("Reply:", reply);
+	const reply = `Added ${messageCount} messages to ${activeThread.id}`;
+	console.log(reply);
 
-	await interaction.followUp({ content: reply, ephemeral: false });
+	await interaction.followUp({ content: reply, ephemeral: true });
 };

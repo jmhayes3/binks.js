@@ -1,0 +1,65 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    if: github.repository == 'jmhayes3/binks.py'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check types
+        run: ./scripts/lint
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    if: github.repository == 'jmhayes3/binks.py'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check build
+        run: ./scripts/build
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    if: github.repository == 'jmhayes3/binks.py'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Bootstrap
+        run: ./scripts/bootstrap
+
+      - name: Run tests
+        run: ./scripts/test

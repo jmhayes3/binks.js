@@ -9,19 +9,19 @@ const openai = new OpenAI({
 
 export const data = new SlashCommandBuilder()
 	.setName('load')
-	.setDescription('Add messages from an OpenAI thread to the current channel/thread')
+	.setDescription('Load an OpenAI thread into the current channel/thread')
 	.addStringOption((option) => option.setName('thread')
 		.setDescription('OpenAI thread ID')
 		.setRequired(true)
 	);
 
 export async function execute(interaction) {
-	await interaction.deferReply({ ephemeral: false });
+	await interaction.deferReply({ ephemeral: true });
 
 	// TODO: check cache first
-	const openaiThreadId = interaction.options.getString('thread');
+	const threadId = interaction.options.getString('thread');
 
-	const messagesList = await openai.beta.threads.messages.list(openaiThreadId);
+	const messagesList = await openai.beta.threads.messages.list(threadId);
 	const messages = Array.from(messagesList.data).map(msg => msg.content).reverse();
 
 	let messageCount = 0;
@@ -50,11 +50,12 @@ export async function execute(interaction) {
 		}
 		messageCount++;
 	}
-	console.log(`Messages: ${messageCount}\nReplies: ${repliesSent}`);
+	console.log(`Loaded ${messageCount} messages using ${repliesSent} replies.`);
+	console.log(`NOTE: OpenAI messages can be larger than the Discord max message size.`);
+	console.log(`NOTE: Therefore, we split large messages up into multiple repleis.`);
 
 	const reply = `Loaded ${repliesSent} messages into this channel/thread.`;
-
 	console.log(`Reply: ${reply}`);
 
-	await interaction.followUp({ content: reply, ephemeral: false });
+	await interaction.followUp({ content: reply, ephemeral: true });
 };

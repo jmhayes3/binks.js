@@ -7,25 +7,26 @@ const openai = new OpenAI({
 });
 
 const getAssistants = async () => {
-	const payload = await openai.beta.assistants.list();
-	// console.log(payload);
+	const assistants = await openai.beta.assistants.list();
 	const data = [];
-	for (let i = 0; i < payload.data.length; i++) {
-		console.log(payload.data[i]);
-		const text = payload.data[i].name + " " + "(" + payload.data[i].model + ")";
+	for (let i = 0; i < assistants.data.length; i++) {
+		const text = `${assistants.data[i].name} (${assistants.data[i].model})`;
 		data.push(text);
 	}
 	return data;
 }
 
-export const data = new SlashCommandBuilder().setName('list').setDescription('List all available OpenAI assistants.');
+export const data = new SlashCommandBuilder()
+	.setName('assistants')
+	.setDescription('List available OpenAI assistants');
 
 export async function execute(interaction) {
 	await interaction.deferReply();
 
 	const assistants = await getAssistants();
-	console.log(assistants);
 	const reply = assistants.join("\n");
+
+	console.log(reply);
 
 	await interaction.followUp({ content: reply, ephemeral: true });
 }
