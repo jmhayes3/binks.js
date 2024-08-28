@@ -7,85 +7,72 @@ const openai = new OpenAI({
   apiKey: process.env['OPENAI_API_KEY'],
 });
 
+// TODO: Clean this up.
 const terminalStates = ["cancelled", "failed", "completed", "expired"];
-const statusCheckLoop = async (openaiThreadId, runId) => {
-  const run = await openai.beta.threads.runs.retrieve(
-    openaiThreadId,
-    runId
-  );
-
+const statusCheckLoop = async (threadId, runId) => {
+  const run = await openai.beta.threads.runs.retrieve(threadId, runId);
   if (terminalStates.indexOf(run.status) < 0) {
     await sleep(1000);
-    return statusCheckLoop(openaiThreadId, runId);
+    return statusCheckLoop(threadId, runId);
   }
-  console.log("RUN: ", run);
-
+  console.log("Run Status:", run.status);
   return run.status;
 }
 
-const addMessage = (threadId, content) => {
-  console.log("Adding message to OpenAI thread", threadId, ":", content);
-  return openai.beta.threads.messages.create(
-    threadId,
-    {
-      role: "user",
-      content: content,
-    }
-  )
-}
-
-export const data = new SlashCommandBuilder().setName('chat').setDescription('Start a chat with an AI assistant.').addStringOption((option) => option.setName('prompt').setDescription('Prompt.').setRequired(true)).addStringOption((option) => option.setName('assistant').setDescription('Assistant ID.').setRequired(false));
+export const data = new SlashCommandBuilder()
+  .setName('chat')
+  .setDescription('Chat with an AI assistant')
+  .addStringOption((option) => option.setName('prompt')
+    .setDescription('Prompt')
+    .setRequired(true)
+  ).addStringOption((option) => option.setName('assistant')
+    .setDescription('Assistant')
+    .setRequired(false)
+  );
 
 export async function execute(interaction) {
   await interaction.deferReply();
 
-  const channelId = await interaction.channelId;
-  console.log("Channel ID: ", channelId);
-
   const interactionId = interaction.id;
-  console.log("Interaction ID: ", interactionId);
+  const prompt = interaction.options.getString('prompt');
+  const assistant = interaction.options.getString('assistant');
+  console.log("Interaction:", interactionId);
+  console.log("Prompt:", prompt);
+  console.log("Assistant:", assistant);
 
-  const message = interaction.options.getString('prompt');
-  console.log("Message: ", message);
-
-  const assistantId = interaction.options.getString('assistant');
-  console.log("Assistant ID: ", assistantId);
-
+  // Create new thread.
   const thread = await openai.beta.threads.create();
-  const openaiThreadId = thread.id;
+  console.log("Thread created:", thread.id);
 
-  await addMessage(openaiThreadId, message);
-
-  const run = await openai.beta.threads.runs.create(
-    openaiThreadId,
-    { assistant_id: assistantId || process.env.ASSISTANT_ID }
+  // Add message to thread. 
+  const message = await openai.beta.threads.messages.create(
+    thread.id,
+    {
+      role: "user",
+      content: prompt,
+    }
   )
-  const status = await statusCheckLoop(openaiThreadId, run.id);
-  console.log("Status: ", status);
+  console.log("Message added:", message.id);
 
-  const messages = await openai.beta.threads.messages.list(openaiThreadId);
-  const response = messages.data[0].content[0].text.value;
+  // Run the thread.
+  const run = await openai.beta.threads.runs.create(
+    thread.id,
+    {
+      assistant_id: assistant ?? process.env.ASSISTANT_ID,
+    }
+  )
 
-  const responses = splitString(response, 2000);
+  // const status = await statusCheckLoop(thread.id, run.id);
+  await statusCheckLoop(thread.id, run.id);
 
-  console.log("Num Responses: ", responses.length);
-  console.log("Responses: ", responses);
+  const messages = await openai.beta.threads.messages.list(thread.id);
+  const replies = splitString(messages.data[0].content[0].text.value, 2000);
+  console.log("Replies:", replies.length);
 
-  await interaction.followUp(responses[0]);
-
-  if (interaction.channel.isThread()) {
-    console.log("is thread");
-    console.log(interaction.channel);
-  } else {
-    console.log("not thread");
-    console.log(interaction.channel);
-  }
-
-  if (responses.length > 1) {
-    for (let i = 1; i < responses.length; ++i) {
-      console.log(responses[i]);
-
-      await interaction.followUp(responses[i]);
+  await interaction.followUp(replies[0]);
+  if (replies.length > 1) {
+    for (let i = 1; i < replies.length; ++i) {
+      await interaction.followUp(replies[i]);
     }
   }
 };

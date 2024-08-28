@@ -35,7 +35,7 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, () => {
 	console.log(`Ready! Logged in as ${client.user.tag}`);
-	client.user.setPresence({ activities: [], status: 'online' });
+	client.user.setPresence({ activities: [], status: 'invisible' });
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
