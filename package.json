@@ -1,11 +1,11 @@
 {
   "name": "binks.js",
   "version": "0.1.0",
-  "description": "",
+  "description": "AI-enabled bot for Discord.",
   "keywords": [],
-  "author": "",
+  "author": "jmhayes3",
   "license": "MIT",
-  "main": "index.js",
+  "main": "app.js",
   "type": "module",
   "scripts": {
     "lint": "eslint .",

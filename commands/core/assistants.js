@@ -18,7 +18,7 @@ const getAssistants = async () => {
 
 export const data = new SlashCommandBuilder()
 	.setName('assistants')
-	.setDescription('List available OpenAI assistants');
+	.setDescription('List available assistants');
 
 export async function execute(interaction) {
 	await interaction.deferReply();
