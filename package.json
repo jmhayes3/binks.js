@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint",
-    "start": "node index.js",
+    "start": "node app.js",
     "register": "node deploy-commands.js"
   },
   "dependencies": {
