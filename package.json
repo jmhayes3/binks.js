@@ -1,28 +1,29 @@
 {
   "name": "binks.js",
   "version": "0.1.0",
-  "description": "AI-enabled bot for Discord.",
-  "keywords": [],
+  "description": "Discord bot for interfacing with AI assistants.",
+  "keywords": [
+    "discord",
+    "openai"
+  ],
   "author": "jmhayes3",
   "license": "MIT",
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "npx eslint .",
     "test": "npm run lint",
-    "start": "node index.js",
-    "register": "node deploy-commands.js"
+    "start": "node app.js",
+    "register": "node deploy-commands.js",
+    "unregister": "node delete-commands.js"
   },
   "dependencies": {
-    "@keyv/redis": "^3.0.1",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
-    "keyv": "^5.0.1",
-    "openai": "^4.53.2"
+    "openai": "^4.57.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
-    "eslint": "^9.9.0",
+    "@eslint/js": "^9.9.1",
     "globals": "^15.9.0"
   }
 }
