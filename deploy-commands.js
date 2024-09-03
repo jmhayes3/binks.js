@@ -29,19 +29,19 @@ for (const folder of commandFolders) {
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // Install guild commands
-try {
-	console.log(`Started refreshing ${commands.length} guild application (/) commands.`);
-
-	// The put method is used to fully refresh all commands
-	const data = await rest.put(
-		Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-		{ body: commands },
-	);
-
-	console.log(`Successfully reloaded ${data.length} guild application (/) commands.`);
-} catch (error) {
-	console.error(error);
-}
+// try {
+// 	console.log(`Started refreshing ${commands.length} guild application (/) commands.`);
+//
+// 	// The put method is used to fully refresh all commands
+// 	const data = await rest.put(
+// 		Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+// 		{ body: commands },
+// 	);
+//
+// 	console.log(`Successfully reloaded ${data.length} guild application (/) commands.`);
+// } catch (error) {
+// 	console.error(error);
+// }
 
 // Install global commands
 try {
