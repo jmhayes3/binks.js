@@ -2,8 +2,6 @@ import 'dotenv/config';
 import { SlashCommandBuilder } from 'discord.js';
 import { OpenAI } from 'openai';
 
-// TODO: Scrap this command, it's not exactly useful.
-
 const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });

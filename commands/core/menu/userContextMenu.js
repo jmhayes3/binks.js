@@ -1,16 +1,17 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder } from 'discord.js';
 
-export const data = new SlashCommandBuilder().setName('user').setDescription('Display user info');
+export const data = new ContextMenuCommandBuilder()
+	.setName('User Info')
+	.setType(ApplicationCommandType.User);
 
 export async function execute(interaction) {
-	if (!interaction.isChatInputCommand()) return;
+	if (!interaction.isUserContextMenuCommand()) return;
 
 	await interaction.deferReply({ ephemeral: true });
 
 	const user = interaction.user;
 	const created = parseInt(interaction.user.createdTimestamp / 1000);
-
-	const userEmbed = new EmbedBuilder()
+	const userContextMenuEmbed = new EmbedBuilder()
 		.setColor('#195ece')
 		.setTitle("User info")
 		.addFields(
@@ -19,7 +20,7 @@ export async function execute(interaction) {
 		.setFooter({ text: `User ID: ${user.id}` })
 		.setThumbnail(user.displayAvatarURL());
 
-	const reply = { embeds: [userEmbed], ephemeral: true };
+	const reply = { embeds: [userContextMenuEmbed], ephemeral: true };
 	console.log(reply);
 
 	await interaction.followUp(reply);

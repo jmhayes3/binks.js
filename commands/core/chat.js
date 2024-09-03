@@ -15,7 +15,6 @@ const statusCheckLoop = async (threadId, runId) => {
     await sleep(1000);
     return statusCheckLoop(threadId, runId);
   }
-  console.log("Run Status:", run.status);
   return run.status;
 }
 
@@ -61,13 +60,11 @@ export async function execute(interaction) {
       assistant_id: assistant ?? process.env.ASSISTANT_ID,
     }
   )
-
   // const status = await statusCheckLoop(thread.id, run.id);
   await statusCheckLoop(thread.id, run.id);
 
   const messages = await openai.beta.threads.messages.list(thread.id);
   const replies = splitString(messages.data[0].content[0].text.value, 2000);
-  console.log("Replies:", replies.length);
 
   await interaction.followUp(replies[0]);
   if (replies.length > 1) {

@@ -44,16 +44,16 @@ try {
 }
 
 // Install global commands
-// try {
-// 	console.log(`Started refreshing ${commands.length} global application (/) commands.`);
-//
-// 	// The put method is used to fully refresh all commands
-// 	const data = await rest.put(
-// 		Routes.applicationCommands(process.env.CLIENT_ID),
-// 		{ body: commands },
-// 	);
-//
-// 	console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
-// } catch (error) {
-// 	console.error(error);
-// }
+try {
+	console.log(`Started refreshing ${commands.length} global application (/) commands.`);
+
+	// The put method is used to fully refresh all commands
+	const data = await rest.put(
+		Routes.applicationCommands(process.env.CLIENT_ID),
+		{ body: commands },
+	);
+
+	console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
+} catch (error) {
+	console.error(error);
+}

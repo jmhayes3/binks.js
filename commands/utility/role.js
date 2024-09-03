@@ -1,6 +1,13 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
-export const data = new SlashCommandBuilder().setName('role').setDescription('Display role info').addRoleOption(option => option.setName('role').setDescription("The role you want to get the info of").setRequired(true));
+export const category = 'utility';
+export const data = new SlashCommandBuilder()
+    .setName('role')
+    .setDescription('Display role info')
+    .addRoleOption(option =>
+        option.setName('role')
+            .setDescription("The role you want to get the info of")
+            .setRequired(true));
 
 export async function execute(interaction) {
     const { options } = interaction;

@@ -31,7 +31,6 @@ export async function execute(interaction) {
 			const text = msg[0].text.value;
 			const replies = splitString(text, 2000);
 			for (let i = 0; i < replies.length; i++) {
-				console.log(`Sending reply ${i} of ${replies.length} for message ${messageCount}`);
 				await interaction.followUp({ content: replies[i] });
 				repliesSent++;
 			}
@@ -51,8 +50,8 @@ export async function execute(interaction) {
 		messageCount++;
 	}
 	console.log(`Loaded ${messageCount} messages using ${repliesSent} replies.`);
-	console.log(`NOTE: OpenAI messages can be larger than the Discord max message size.`);
-	console.log(`NOTE: Therefore, we split large messages up into multiple repleis.`);
+	console.log(`OpenAI messages can be larger than the Discord max message size.`);
+	console.log(`Therefore, we split large messages up into multiple replies.`);
 
 	const reply = `Loaded ${repliesSent} messages into this channel/thread.`;
 	console.log(`Reply: ${reply}`);

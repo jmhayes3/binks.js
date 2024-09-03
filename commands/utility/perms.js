@@ -2,21 +2,19 @@ import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from 'discord.
 
 export const data = new SlashCommandBuilder()
   .setName("permissions")
-  .setDescription("Displays permissions of given user.")
+  .setDescription("Display user permissions")
   .addUserOption(option => option.setName("user").setDescription("The user to get permissions for").setRequired(false))
 
 export async function execute(interaction) {
   if (!interaction.isChatInputCommand()) return;
 
   const { options } = interaction;
-
   const member = options.getMember("user") || interaction.member;
   const user = options.getUser("user") || interaction.user;
 
   if (!member) return interaction.reply({ content: "Member **could not** be found!", ephemeral: true, });
 
   let permissionFlags = Object.keys(PermissionFlagsBits);
-
   let output = `**Permissions for** **${member}:**  \n\`\`\``;
   for (let i = 0; i < permissionFlags.length; i++) {
     let permissionName = permissionFlags[i];
