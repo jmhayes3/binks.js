@@ -15,8 +15,8 @@ export async function execute(interaction) {
 
 	const assistants = await openai.beta.assistants.list();
 	const payload = [];
-	for (let i = 0; i < assistants.payload.length; i++) {
-		const text = `${assistants.payload[i].name} (${assistants.payload[i].model})`;
+	for (let i = 0; i < assistants.data.length; i++) {
+		const text = `${assistants.data[i].name} (${assistants.data[i].model})`;
 		payload.push(text);
 	}
 	const reply = assistants.join("\n");
