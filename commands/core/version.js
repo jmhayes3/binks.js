@@ -16,14 +16,12 @@ export async function execute(interaction) {
     console.log(response);
     const tag = response.url.split('/').at(-1);
     const version = tag.split('v').at(-1);
-    reply = version;
+    const latest = version;
+    if (VERSION < latest) {
+      reply = `The latest version is ${latest}. You are using version ${VERSION}.`;
+    }
   } catch (error) {
     console.error(`Error while retrieving the latest version. No release found.\n ${error}`);
   }
-
-  if (VERSION < latest) {
-    reply = `The latest version is ${latest}. You are using version ${VERSION}.`;
-  }
-
   await interaction.followUp({ content: reply, ephemeral: true });
 }

@@ -19,7 +19,7 @@ export async function execute(interaction) {
 		const text = `${assistants.data[i].name} (${assistants.data[i].model})`;
 		payload.push(text);
 	}
-	const reply = assistants.join("\n");
+	const reply = payload.join("\n");
 	console.log(reply);
 	await interaction.followUp({ content: reply, ephemeral: true });
 }
