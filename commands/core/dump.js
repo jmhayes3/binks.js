@@ -6,6 +6,7 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
+export const category = 'core';
 export const data = new SlashCommandBuilder()
 	.setName('dump')
 	.setDescription('Dump messages from current channel/thread into an OpenAI thread')

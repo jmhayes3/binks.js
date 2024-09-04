@@ -7,6 +7,7 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
+export const category = 'core';
 export const data = new SlashCommandBuilder()
 	.setName('load')
 	.setDescription('Load an OpenAI thread into the current channel/thread')

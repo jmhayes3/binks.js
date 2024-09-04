@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { SlashCommandBuilder, AttachmentBuilder } from 'discord.js';
 
+export const category = 'core';
 export const data = new SlashCommandBuilder().setName('upload').setDescription('Upload a file');
 
 export async function execute(interaction) {

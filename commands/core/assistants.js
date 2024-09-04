@@ -6,6 +6,7 @@ const openai = new OpenAI({
 	apiKey: process.env['OPENAI_API_KEY'],
 });
 
+export const category = 'core';
 export const data = new SlashCommandBuilder()
 	.setName('assistants')
 	.setDescription('List available assistants');

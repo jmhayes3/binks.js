@@ -18,16 +18,18 @@ const statusCheckLoop = async (threadId, runId) => {
   return run.status;
 }
 
+export const category = 'core';
 export const data = new SlashCommandBuilder()
   .setName('chat')
   .setDescription('Chat with an AI assistant')
-  .addStringOption((option) => option.setName('prompt')
-    .setDescription('Prompt')
-    .setRequired(true)
-  ).addStringOption((option) => option.setName('assistant')
-    .setDescription('Assistant')
-    .setRequired(false)
-  );
+  .addStringOption((option) =>
+    option.setName('prompt')
+      .setDescription('Prompt')
+      .setRequired(true))
+  .addStringOption((option) =>
+    option.setName('assistant')
+      .setDescription('Assistant')
+      .setRequired(false));
 
 export async function execute(interaction) {
   await interaction.deferReply();

@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "description": "Discord bot for interfacing with AI assistants.",
   "keywords": [
-    "discord",
-    "openai"
+    "discord"
   ],
   "author": "jmhayes3",
   "license": "MIT",
@@ -24,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "eslint": "^9.9.1",
     "globals": "^15.9.0"
   }
 }

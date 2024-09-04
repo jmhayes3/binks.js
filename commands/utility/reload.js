@@ -17,13 +17,15 @@ export async function execute(interaction) {
     return interaction.reply(`There is no command with name \`${commandName}\`!`);
   }
 
-  delete require.cache[require.resolve(`../${command.category}/${command.data.name}.js`)];
-
   try {
-    interaction.client.commands.delete(command.data.name);
-    const newCommand = require(`../${command.category}/${command.data.name}.js`);
-    interaction.client.commands.set(newCommand.data.name, newCommand);
-    await interaction.reply(`Command \`${newCommand.data.name}\` was reloaded!`);
+    if (!command.category) {
+      await interaction.reply('Command does not have a category')
+    } else {
+      interaction.client.commands.delete(command.data.name);
+      const newCommand = await import(`../${command.category}/${command.data.name}.js`);
+      interaction.client.commands.set(newCommand.data.name, newCommand);
+      await interaction.reply(`Command \`${newCommand.data.name}\` was reloaded!`);
+    }
   } catch (error) {
     console.error(error);
     await interaction.reply(`There was an error while reloading a command \`${command.data.name}\`:\n\`${error.message}\``);
