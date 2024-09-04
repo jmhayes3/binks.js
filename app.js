@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
-import { Client, Collection, GatewayIntentBits, Events } from 'discord.js';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
 
 const client = new Client({
 	intents: [
@@ -29,39 +29,17 @@ for (const folder of commandFolders) {
 	}
 }
 
-client.once(Events.ClientReady, () => {
-	console.log(`Ready! Logged in as ${client.user.tag}`);
-	client.user.setPresence({ activities: [], status: 'online' });
-});
+const eventsPath = path.join(path.dirname(new URL(import.meta.url).pathname), 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-client.on(Events.InteractionCreate, async (interaction) => {
-	try {
-		const command = interaction.client.commands.get(interaction.commandName);
-		if (interaction.isChatInputCommand()) {
-			console.log("chat input command");
-			await command.execute(interaction);
-		}
-		else if (interaction.isUserContextMenuCommand()) {
-			console.log("user context menu command");
-			await command.execute(interaction);
-		}
-		else if (interaction.isMessageContextMenuCommand()) {
-			console.log("message context menu command");
-			await command.execute(interaction);
-		}
-		else {
-			console.log("invalid command");
-			return;
-		}
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-		else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = await import(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
-});
+}
 
 client.login(process.env.DISCORD_TOKEN);
