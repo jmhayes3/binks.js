@@ -21,7 +21,7 @@ const statusCheckLoop = async (threadId, runId) => {
 export const category = 'core';
 export const data = new SlashCommandBuilder()
   .setName('chat')
-  .setDescription('Chat with an AI assistant')
+  .setDescription('Chat with an assistant.')
   .addStringOption((option) =>
     option.setName('prompt')
       .setDescription('Prompt')
@@ -34,12 +34,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
   await interaction.deferReply();
 
-  const interactionId = interaction.id;
   const prompt = interaction.options.getString('prompt');
   const assistant = interaction.options.getString('assistant');
-  console.log("Interaction:", interactionId);
-  console.log("Prompt:", prompt);
-  console.log("Assistant:", assistant);
 
   // Create new thread.
   const thread = await openai.beta.threads.create();

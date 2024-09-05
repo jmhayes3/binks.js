@@ -17,6 +17,7 @@
     "unregister": "node delete-commands.js"
   },
   "dependencies": {
+    "discord-api-types": "^0.37.99",
     "discord.js": "^14.16.1",
     "dotenv": "^16.4.5",
     "openai": "^4.57.0"

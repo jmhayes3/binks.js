@@ -3,10 +3,10 @@ import { SlashCommandBuilder } from 'discord.js';
 export const category = 'utility';
 export const data = new SlashCommandBuilder()
   .setName('reload')
-  .setDescription('Reload a command')
+  .setDescription('Reload a command.')
   .addStringOption(option =>
     option.setName('command')
-      .setDescription('The command to reload')
+      .setDescription('The command to reload.')
       .setRequired(true))
 
 export async function execute(interaction) {
@@ -15,6 +15,10 @@ export async function execute(interaction) {
 
   if (!command) {
     return interaction.reply(`There is no command with name \`${commandName}\`!`);
+  }
+
+  if (!interaction.user.id === '618552280697929761') {
+    return interaction.reply(`You are not authorized to execute \`${commandName}\`!`);
   }
 
   try {

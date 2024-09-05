@@ -19,7 +19,6 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
 	await interaction.deferReply({ ephemeral: true });
 
-	// TODO: check cache first
 	const threadId = interaction.options.getString('thread');
 
 	const messagesList = await openai.beta.threads.messages.list(threadId);

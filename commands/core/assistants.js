@@ -9,7 +9,7 @@ const openai = new OpenAI({
 export const category = 'core';
 export const data = new SlashCommandBuilder()
 	.setName('assistants')
-	.setDescription('List available assistants');
+	.setDescription('List assistants.');
 
 export async function execute(interaction) {
 	await interaction.deferReply();

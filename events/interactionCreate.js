@@ -10,16 +10,28 @@ export async function execute(interaction) {
     if (interaction.isChatInputCommand()) {
       console.log("chat input command");
       await command.execute(interaction);
-    }
-    else if (interaction.isUserContextMenuCommand()) {
+    } else if (interaction.isAutocomplete()) {
+      console.log("is autocomplete");
+
+      const command = interaction.client.commands.get(interaction.commandName);
+
+      if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+      }
+
+      try {
+        await command.autocomplete(interaction);
+      } catch (error) {
+        console.error(error);
+      }
+    } else if (interaction.isUserContextMenuCommand()) {
       console.log("user context menu command");
       await command.execute(interaction);
-    }
-    else if (interaction.isMessageContextMenuCommand()) {
+    } else if (interaction.isMessageContextMenuCommand()) {
       console.log("message context menu command");
       await command.execute(interaction);
-    }
-    else {
+    } else {
       console.log("invalid command");
       return;
     }
