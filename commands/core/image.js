@@ -17,14 +17,15 @@ export const data = new SlashCommandBuilder()
       .setRequired(true));
 
 export async function execute(interaction) {
+  await interaction.deferReply();
   console.log(interaction);;
   const attachment = await interaction.options.getAttachment('attach');
   console.log(attachment);
 
   // Check if the interaction contains any attachments
-  // if (!interaction.attachments) {
-  //   return interaction.reply('Please upload a file.');
-  // }
+  if (!interaction.attachments) {
+    return interaction.reply('Please attach an image');
+  }
 
   // Get the first attachment
   const file = attachment.attachment;
@@ -47,16 +48,13 @@ export async function execute(interaction) {
   // Save the file content to a local file
   fs.writeFileSync(`./${buffer.name}`, buffer);
 
-  await interaction.followUp('File has been downloaded and saved locally.');
-
-  console.log('creating variation with dall-e-2')
   const image = await openai.images.createVariation({
-    image: fs.createReadStream('image.png'),
+    image: fs.createReadStream(buffer.name),
   });
 
   console.log(image);
-  console.log('---------------');
   console.log(image.data);
 
-  // Build attachment and reply to user.
+  const newImage = new AttachmentBuilder(image.data[0].url);
+  await interaction.followUp({ files: [newImage], content: `Variation of ${buffer.name} created.` });
 }
